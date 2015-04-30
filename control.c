@@ -12,4 +12,8 @@
 
 int main(int argc, char **argv) {
 
+	/* Set traps for cpu */
+	cpu_page_fault = &scheduler_trap_page_fault;
+	cpu_context_switch = &scheduler_context_switch;
+
 }
