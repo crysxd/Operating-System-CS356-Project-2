@@ -8,5 +8,10 @@
 #define __PAGER__
 
 #include <stdio.h>
+#include "types.h"
+
+void pager_tick();
+
+void pager_load(uint32_t address, trap adress_error);
 
 #endif

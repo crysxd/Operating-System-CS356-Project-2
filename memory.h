@@ -9,4 +9,8 @@
 
 #include <stdio.h>
 
+void memory_tick();
+
+void memory_access(uint32_t address, trap page_fault);
+
 #endif
