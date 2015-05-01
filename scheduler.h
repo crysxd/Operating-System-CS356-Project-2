@@ -28,9 +28,6 @@ void* scheduler_perform_scheduling();
 /* Function called by cpu when a page_fault happend */
 void scheduler_trap_page_fault(uint32_t address);
 
-/* Function called by pager when a address is not accessible */
-void scheduler_trap_page_fault(uint32_t address);
-
 /* Function called by cpu when a context switch should be performed */
 void scheduler_trap_context_switch();
 
