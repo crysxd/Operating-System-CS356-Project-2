@@ -15,6 +15,10 @@
 trap cpu_page_fault;
 trap cpu_context_switch;
 
+/* Registers */
+uint32_t cpu_register_mar; /* Memory Address Register */
+uint32_t cpu_register_mdr; /* Memory Data Register */
+
 /* Used to indicate a new tick */
 void cpu_tick();
 
