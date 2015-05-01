@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include "types.h"
 
 /* Pointers to keep track of the processes' current states */
@@ -16,17 +17,18 @@ static pcb_t *ready_queue;
 static pcb_t *blocked_list;
 static pcb_t *running;
 
-/* Used to indicate a new tick */
-void scheduler_tick();
+/* Used to indicate a new tick. Returns false if the tick was consumed and
+   the CPU should not run the process this tick */
+bool scheduler_tick();
 
 /* Used to add a new process to the scheduler, start_time will not be checked */
 void scheduler_add_process(pcb_t *process);
 
 /* Used to trigger a new scheduling decision */
-void* scheduler_perform_scheduling();
+void scheduler_perform_scheduling();
 
 /* Function called by cpu when a page_fault happend */
-void scheduler_trap_page_fault(uint32_t address);
+void scheduler_trap_page_fault();
 
 /* Function called by cpu when a context switch should be performed */
 void scheduler_trap_context_switch();
