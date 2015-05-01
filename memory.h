@@ -8,6 +8,8 @@
 #define __MEMORY__
 
 #include <stdio.h>
+#include <inttypes.h>
+#include "types.h"
 
 void memory_tick();
 
