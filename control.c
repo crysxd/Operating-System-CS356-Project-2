@@ -20,6 +20,24 @@ int main(int argc, char **argv) {
 
 	/* Read process trace */
 	control_create_process_arrival_queue(argv[1]);
+
+	print_list(control_process_queue_head, "arrival_list");
+
+	/* Perform ticks */
+	while(control_process_queue_head != NULL || !scheduler_all_processes_done()) {
+
+		/* Check if a new process arrives to the current time */
+		if(control_process_queue_head != NULL && 
+			control_process_queue_head->start_time == cpu_time) {
+			/* Add it and remove it from the arrival queue */
+			pcb_t *p = control_process_queue_head;
+			control_process_queue_head = p->next;
+			scheduler_add_process(p);
+		}
+
+		/* Increase CPU time */
+		cpu_time++;
+	}
 }
 
 void control_create_process_arrival_queue(char *trace_file_name) {
@@ -105,13 +123,13 @@ void control_create_process_arrival_queue(char *trace_file_name) {
 		printf("\tio_count = %" PRIu64 "\n", pcb->io_count);
 
     	/* Link pcb to previous in queue or set as head if queue is empty */
-    	if(control_process_arrival_queue_head == NULL) {
-    		control_process_arrival_queue_head = pcb;
+    	if(control_process_queue_head == NULL) {
+    		control_process_queue_head = pcb;
     	} else {
-    		control_process_arrival_queue_tail->next = pcb;
+    		control_process_queue_tail->next = pcb;
     	}
 
     	/* Set pcb as new tail in queue */
-    	control_process_arrival_queue_tail = pcb;
+    	control_process_queue_tail = pcb;
 	}
 }
