@@ -13,8 +13,10 @@
 #include "types.h"
 
 /* Pointers to keep track of the processes' current states */
-static pcb_t *ready_queue;
-static pcb_t *blocked_list;
+static pcb_t *ready_queue_head = NULL;
+static pcb_t *ready_queue_tail = NULL;
+static pcb_t *blocked_list_head = NULL;
+static pcb_t *blocked_list_tail = NULL;
 static pcb_t *running;
 
 /* Used to indicate a new tick. Returns false if the tick was consumed and
