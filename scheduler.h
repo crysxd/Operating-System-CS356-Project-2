@@ -41,4 +41,8 @@ void scheduler_block(pcb_t *process);
 /* Used to move a process from the blocked to the ready queue */;
 void scheduler_ready(pcb_t *process);
 
+/* Used to append a process to the tail of the ready queue. If the process given
+   is the current head, it will be moved to the tail */
+void scheduler_move_process_to_ready_queue_tail(pcb_t *process);
+
 #endif
