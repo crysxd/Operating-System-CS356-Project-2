@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 	if(argc < 2) {
 		printf("Not enough arguments, usage: "
 			"simulator PATH_TO_PROCESS_TRACE\n");
-		return 1;
+		return ERR_NO_TOO_FEW_ARGS;
 	}
 
 	/* Set traps for cpu */
@@ -28,7 +28,7 @@ void control_create_process_arrival_queue(char *trace_file_name) {
 	if((trace_file = fopen(trace_file_name, "r")) == NULL) {
 		printf("ERROR: Unable to read prcess trace file \"%s\" (%s)",
 			trace_file_name, strerror(errno));
-		exit(2);
+		exit(ERR_NO_UNABLE_OPEN_PROCESS_TRACE);
 	}
 
 	/* Iterate over all lines */
@@ -49,7 +49,7 @@ void control_create_process_arrival_queue(char *trace_file_name) {
 				if(ferror(trace_file)) {
 					printf("ERROR: error while reading trace file! (%s)\n",
 						strerror(errno));
-					exit(3);
+					exit(ERR_NO_PROCESS_TRACE_PARSE);
 				} else {
 					/* line or file end, override with string end and break */
 					line[counter] = 0;
@@ -76,7 +76,7 @@ void control_create_process_arrival_queue(char *trace_file_name) {
     		if(p == NULL) {
     			printf("ERROR: error while parsing trace file! (%s)\n",
 						strerror(errno));
-    			exit(4);
+    			exit(ERR_NO_PROCESS_TRACE_PARSE);
     		}
 
     		/* copy */
