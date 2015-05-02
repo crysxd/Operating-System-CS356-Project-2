@@ -45,4 +45,10 @@ void scheduler_ready(pcb_t *process);
    is the current head, it will be moved to the tail */
 void scheduler_move_process_to_ready_queue_tail(pcb_t *process);
 
+/* Prints all elements of the list */
+void print_list(pcb_t *list_head, char *list_name); 
+
+/* Checks if there are un finished processes */
+bool scheduler_all_processes_done();
+
 #endif
