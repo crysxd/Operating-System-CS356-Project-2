@@ -11,7 +11,6 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <limits.h>
-#include <stdarg.h>
 #include "scheduler.h"
 #include "cpu.h"
 #include "memory.h"
@@ -19,13 +18,13 @@
 #include "error_codes.h"
 
 /* Queue for arriving procesess. Feed from trace file */ 
-static pcb_t *control_process_queue_head = NULL;
-static pcb_t *control_process_queue_tail = NULL;
+static pcb_t *process_queue_head = NULL;
+static pcb_t *process_queue_tail = NULL;
 
 uint64_t cpu_time = 0;
 
 /* Loads the process file and puts the proceeses into 
-   control_process_queue_head */
+   process_queue_head */
 void control_create_process_arrival_queue(char *trace_file_name);
 
 /* Loads the memory trace file for the given process from the given directory */

@@ -22,18 +22,18 @@ int main(int argc, char **argv) {
 	/* Read process trace */
 	control_create_process_arrival_queue(argv[1]);
 
-	print_list(control_process_queue_head, "arrival_list");
+	print_list(process_queue_head, "arrival_list");
 
 	/* Perform ticks */
-	while(control_process_queue_head != NULL || !scheduler_all_processes_done()) {
+	while(process_queue_head != NULL || !scheduler_all_processes_done()) {
 		printf("\n=============================\n"
 			"[CONTROL] CPU time: %" PRIu64 "\n", cpu_time);
 		/* Check if a new process arrives to the current time */
-		if(control_process_queue_head != NULL && 
-			control_process_queue_head->start_time == cpu_time) {
+		if(process_queue_head != NULL && 
+			process_queue_head->start_time == cpu_time) {
 			/* Add it and remove it from the arrival queue */
-			pcb_t *p = control_process_queue_head;
-			control_process_queue_head = p->next;
+			pcb_t *p = process_queue_head;
+			process_queue_head = p->next;
 			control_load_memory_trace(p, argv[2]);
 			scheduler_add_process(p);
 		}
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 }
 
 /* Loads the process file and puts the proceeses into 
-   control_process_queue_head */
+   process_queue_head */
 void control_create_process_arrival_queue(char *trace_file_name) {
 	/* Open file, handle errors */
 	FILE* trace_file;
@@ -120,14 +120,14 @@ void control_create_process_arrival_queue(char *trace_file_name) {
 		printf("\tio_count = %" PRIu64 "\n", pcb->io_count);
 
     	/* Link pcb to previous in queue or set as head if queue is empty */
-    	if(control_process_queue_head == NULL) {
-    		control_process_queue_head = pcb;
+    	if(process_queue_head == NULL) {
+    		process_queue_head = pcb;
     	} else {
-    		control_process_queue_tail->next = pcb;
+    		process_queue_tail->next = pcb;
     	}
 
     	/* Set pcb as new tail in queue */
-    	control_process_queue_tail = pcb;
+    	process_queue_tail = pcb;
 	}
 }
 
