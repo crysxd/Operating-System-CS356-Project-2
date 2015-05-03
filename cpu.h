@@ -13,7 +13,6 @@
 #include "types.h"
 
 /* Function pointer for differnt traps */
-extern trap cpu_page_fault;
 extern trap cpu_context_switch;
 extern trap cpu_timer_done;
 

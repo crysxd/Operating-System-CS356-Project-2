@@ -32,6 +32,7 @@ void cpu_tick() {
 
 	/* Access memory location */
 	printf("[CPU] Accessing %" PRIu32 "\n", cpu_register_ip->address);
+	memory_access(cpu_register_ip->address);
 
 	/* Move instruction pointer to next */
 	instruction_t *mt = cpu_register_ip;
