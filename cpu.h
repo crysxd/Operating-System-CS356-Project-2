@@ -8,22 +8,29 @@
 #define __CPU__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include "types.h"
 
 /* Function pointer for differnt traps */
-trap cpu_page_fault;
-trap cpu_context_switch;
+extern trap cpu_page_fault;
+extern trap cpu_context_switch;
+extern trap cpu_timer_done;
 
 /* Registers */
-uint32_t cpu_register_mar; /* Memory Address Register */
-uint32_t cpu_register_mdr; /* Memory Data Register */
+extern uint32_t cpu_register_mar; /* Memory Address Register */
+extern uint32_t cpu_register_mdr; /* Memory Data Register */
+extern uint32_t cpu_register_tmr; /* Timer Register */
+extern instruction_t *cpu_register_ip;  /* Instruction pointer register */
+
+/* Stall counter */
+extern uint64_t cpu_stall_counter;
 
 /* Used to indicate a new tick */
 void cpu_tick();
 
 /* Used to run a process on the CPU */
-void cpu_run(memory_trace_t *process, uint64_t *instruction_pointer);
+void cpu_run(instruction_t *instruction_pointer);
 
 /* Used to preempt the currently running process */
 void cpu_preempt();

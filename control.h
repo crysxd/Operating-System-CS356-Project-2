@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <unistd.h>
+#include <limits.h>
+#include <stdarg.h>
 #include "scheduler.h"
 #include "cpu.h"
 #include "memory.h"
@@ -22,4 +24,12 @@ static pcb_t *control_process_queue_tail = NULL;
 
 uint64_t cpu_time = 0;
 
+/* Loads the process file and puts the proceeses into 
+   control_process_queue_head */
 void control_create_process_arrival_queue(char *trace_file_name);
+
+/* Loads the memory trace file for the given process from the given directory */
+void control_load_memory_trace(pcb_t *process, char *dir);
+
+/* Reads a single line from the file pointer */
+int32_t read_line(FILE *file, char *dest);

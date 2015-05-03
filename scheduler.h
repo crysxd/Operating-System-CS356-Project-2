@@ -8,16 +8,24 @@
 #define __SCHEDULER__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include "types.h"
+#include "cpu.h"
+
+/* The quantum used by rounf robin */
+extern uint32_t scheduler_rr_quantum;
 
 /* Pointers to keep track of the processes' current states */
 static pcb_t *ready_queue_head = NULL;
 static pcb_t *ready_queue_tail = NULL;
 static pcb_t *blocked_list_head = NULL;
 static pcb_t *blocked_list_tail = NULL;
-static pcb_t *running;
+static pcb_t *running = NULL;
+
+/* Couter to use ticks for context switch */
+static uint64_t consume_ticks = 0;
 
 /* Used to indicate a new tick. Returns false if the tick was consumed and
    the CPU should not run the process this tick */

@@ -12,11 +12,11 @@
 #define TICKS_TO_SECS(x) x/TICKS_PER_SEC
 
 /* structure to make a linked list representing a memory trace file */
-struct memory_trace {
-	struct memory_trace *next;
+struct instruction {
+	struct instruction *next;
 	uint32_t address;
 };
-typedef struct memory_trace memory_trace_t;
+typedef struct instruction instruction_t;
 
 /* pcb_t is a structure representing a simple process control block */
 struct pcb {
@@ -24,10 +24,9 @@ struct pcb {
 	uint64_t cpu_time;
 	uint64_t start_time;
 	uint64_t waiting_time;
-	uint64_t instruction_pointer;
 	uint64_t end_time;
 	uint64_t io_count;
-	memory_trace_t *memory_trace;
+	instruction_t *instruction_pointer;
 	struct pcb *next;
 };
 typedef struct pcb pcb_t;
