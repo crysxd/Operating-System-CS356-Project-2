@@ -55,4 +55,25 @@ bool memory_access(uint32_t address) {
 	}
 }
 
+/* Prints a overview over the current inverted page table */
+void print_inverted_page_table() {
+	printf("[MEMORY] Current page table:\n");
+	printf("------------------------------------------------------------------\n");
+	printf("| %-10s | %-10s | %-10s | %-10s | %-10s |\n",
+		"Frame", "PID", "Loaded", "Last used", "SC Bit");
+	printf("------------------------------------------------------------------\n");
+
+	/* Iterate over tbale */
+	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+		printf("| %-10d | %-10d | %-10" PRIu64 " | %-10" PRIu64 " | %-10d |\n",
+			i,
+			inverted_page_table[i].owner_pid, 
+			inverted_page_table[i].time_loaded, 
+			inverted_page_table[i].time_used, 
+			inverted_page_table[i].used);
+
+	}
+
+	printf("------------------------------------------------------------------\n");
+}
 

@@ -36,5 +36,7 @@ void memory_init();
    in memory */
 bool memory_access(uint32_t address);
 
+/* Prints a overview over the current inverted page table */
+void print_inverted_page_table();
 
 #endif
