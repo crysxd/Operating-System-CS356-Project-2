@@ -10,37 +10,41 @@
 trap cpu_page_fault = NULL;
 trap cpu_context_switch = NULL;
 trap cpu_timer_done = NULL;
-uint32_t cpu_register_mar = 0;
-uint32_t cpu_register_mdr = 0;
 uint32_t cpu_register_tmr = 0;
-instruction_t *cpu_register_ip = NULL;
+instruction_t **cpu_register_ip = NULL;
 uint64_t cpu_stall_counter = 0;
 
 /* Used to run a process on the CPU */
-void cpu_run(instruction_t *instruction_pointer) {
+void cpu_run(instruction_t **instruction_pointer) {
 	cpu_register_ip = instruction_pointer;
+}
+
+/* Used to preempt a process on the CPU */
+void cpu_preempt() {
+	cpu_register_ip = NULL;
 }
 
 /* Used to indicate a new tick */
 void cpu_tick() {
 	/* If no instructions are availabel, the cpu is sattling. Increse counter */
 	if(cpu_register_ip == NULL) {
-		cpu_stall_counter++;
-		printf("[CPU] Stall (%" PRIu64 ")\n", cpu_stall_counter);
+		cpu_stall_tick();
 		return;
 	}
 
 	/* Access memory location */
-	printf("[CPU] Accessing %" PRIu32 "\n", cpu_register_ip->address);
-	memory_access(cpu_register_ip->address);
+	printf("[CPU] Accessing %" PRIu32 "\n", (*cpu_register_ip)->address);
+	if(memory_access((*cpu_register_ip)->address)) {
+		return;
+	}
 
 	/* Move instruction pointer to next */
-	instruction_t *mt = cpu_register_ip;
-	cpu_register_ip = cpu_register_ip->next;
+	instruction_t *mt = *cpu_register_ip;
+	*cpu_register_ip = (*cpu_register_ip)->next;
 	free(mt);
 
 	/* If the next memory location is null, the programm is done */
-	if(cpu_register_ip == NULL) {
+	if(*cpu_register_ip == NULL) {
 		cpu_context_switch();
 	}
 
@@ -55,4 +59,10 @@ void cpu_tick() {
 			cpu_timer_done();
 		}
 	}
+}
+
+/* Used to indicate a tick cannot be used */
+void cpu_stall_tick() {
+	cpu_stall_counter++;
+	printf("[CPU] Stall (%" PRIu64 ")\n", cpu_stall_counter);
 }

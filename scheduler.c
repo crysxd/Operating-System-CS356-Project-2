@@ -12,10 +12,10 @@ uint32_t scheduler_rr_quantum = 200;
 /* Used to indicate a new tick. Returns false if the tick was consumed and
    the CPU should not run the process this tick */
 bool scheduler_tick() {
-	if(consume_ticks > 0) {
-		consume_ticks--;
+	if(scheduler_consume_ticks > 0) {
+		scheduler_consume_ticks--;
 		printf("[SCHEDULER] Performing context switch, %" PRIu64 " ticks left\n"
-			, consume_ticks);
+			, scheduler_consume_ticks);
 		return false;
 	}
 
@@ -41,9 +41,14 @@ void scheduler_add_process(pcb_t *process) {
 void scheduler_perform_scheduling() {
 	if(ready_queue_head == NULL) {
 		running = NULL;
+		cpu_preempt();
 		printf("[SCHEDULER] Queue is empty!\n");
 		return;
 	}
+
+
+	printf("[SCHEDULER] Scheduling, current queue:\n");
+	print_list(ready_queue_head, "ready_queue");
 
 	/* Reset CPU timer to guarantee that the control is given back to the 
 	   scheduler after the time quantum is elapsed */
@@ -57,27 +62,31 @@ void scheduler_perform_scheduling() {
 
 	/* Put process on CPU and save to running */
 	running = ready_queue_head;
-	cpu_run(running->instruction_pointer);
+	cpu_run(&running->instruction_pointer);
 
 	printf("[SCHEDULER] Put process \"%s\" on CPU\n", running->name);
-	print_list(ready_queue_head, "ready_queue");
 
 	/* Move the beginning of the beginning of the queue to the next element */
 	ready_queue_head = ready_queue_head->next;
 
 	/* Consume the next 50 ticks to simulate context switching time */
-	consume_ticks = 50;
+	scheduler_consume_ticks = 5;
 }
 
 /* Function called by cpu when a page_fault happend */
 void scheduler_trap_page_fault() {
+	printf("[SCHEDULER] Page fault for page %d\n", 
+		running->instruction_pointer->address);
+
+	/* Call pager to load the needed page, will block the running process and
+	   so cause resheduling */
+	pager_load(running);
 
 }
 
 /* Function called by cpu when a context switch should be performed */
 void scheduler_trap_context_switch() {
 	printf("[SCHEDULER] Trap context switch running...\n");
-	running->instruction_pointer = cpu_register_ip;
 
 	/* If the process is not finished yet, put it back to the ready queue. Else
 	   free its memory and delete it */
@@ -93,14 +102,62 @@ void scheduler_trap_context_switch() {
 	scheduler_perform_scheduling();
 }
 
-/* Used to move a process from the ready to the blocked list */
-void scheduler_block(pcb_t *process) {
+/* Used to move the currently running process from the ready to 
+   the blocked list */
+void scheduler_block() {
+	printf("[SCHEDULER] \"%s\" is blocked\n", 
+		running->name);
 
+	/* Append the process to the list of blocked processes or set as head if
+	   list is empty */
+	if(blocked_list_head == NULL) {
+		blocked_list_head = running;
+	} else {
+		blocked_list_tail->next = running;
+	}
+
+	/* Set process as new tail */
+	blocked_list_tail = running;
+	blocked_list_tail->next = NULL;
+
+	/* Perform a context switch to a new process */
+	scheduler_perform_scheduling();
 }
 
 /* Used to move a process from the blocked to the ready queue */;
 void scheduler_ready(pcb_t *process) {
+	printf("[SCHEDULER] \"%s\" is runnable\n", 
+		process->name);
 
+	/* If process is the head of the blocked list, replace the head */
+	if(blocked_list_head == process) {
+		blocked_list_head = blocked_list_head->next;
+	}
+
+	/* Else search for the process and cut it out */
+	else {
+		/* Iterate over blocked list */
+		pcb_t *e = blocked_list_head;
+		while(e != NULL) {
+			/* If the next element after e is process */
+			if(e->next == process) {
+				/* Cut process out of queue */
+				e->next = process->next;
+				process->next = NULL;
+				break;
+			}
+
+			e = e->next;
+		}
+	}
+
+	/* Add process to ready queue */
+	scheduler_move_process_to_ready_queue_tail(process);
+
+	/* Trigger scheduling if no process is rsunning */
+	if(running == NULL) {
+		scheduler_perform_scheduling();
+	}
 }
 
 /* Used to append a process to the tail of the ready queue. If the process given

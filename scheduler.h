@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include "types.h"
 #include "cpu.h"
+#include "pager.h"
 
 /* The quantum used by rounf robin */
 extern uint32_t scheduler_rr_quantum;
@@ -25,7 +26,7 @@ static pcb_t *blocked_list_tail = NULL;
 static pcb_t *running = NULL;
 
 /* Couter to use ticks for context switch */
-static uint64_t consume_ticks = 0;
+static uint64_t scheduler_consume_ticks = 0;
 
 /* Used to indicate a new tick. Returns false if the tick was consumed and
    the CPU should not run the process this tick */

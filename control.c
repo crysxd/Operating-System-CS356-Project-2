@@ -21,8 +21,10 @@ int main(int argc, char **argv) {
 
 	/* Read process trace */
 	control_create_process_arrival_queue(argv[1]);
-
 	print_list(process_queue_head, "arrival_list");
+
+	/* Prepare memory */
+	memory_init();
 
 	/* Perform ticks */
 	while(process_queue_head != NULL || !scheduler_all_processes_done()) {
@@ -38,15 +40,20 @@ int main(int argc, char **argv) {
 			scheduler_add_process(p);
 		}
 
+		/* Perform a pager tick */
+		pager_tick();
+
 		/* Perform a scheduler tick, if the tick is not used perform a cpu 
-		   tick */
+		   tick, otherwise inform the cpu about the wasted tick */
 		if(scheduler_tick()) {
 			cpu_tick();
+		} else {
+			cpu_stall_tick();
 		}
 
 		/* Increase CPU time */
 		cpu_time++;
-		usleep(10000);
+		//usleep(100000);
 	}
 }
 

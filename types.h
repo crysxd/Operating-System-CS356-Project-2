@@ -7,6 +7,9 @@
 #ifndef __TYPES__
 #define __TYPES__
 
+#include <stdbool.h>
+#include <inttypes.h>
+
 #define TICKS_PER_SEC 100.0
 #define SECS_TO_TICKS(x) x*TICKS_PER_SEC
 #define TICKS_TO_SECS(x) x/TICKS_PER_SEC
@@ -30,6 +33,15 @@ struct pcb {
 	struct pcb *next;
 };
 typedef struct pcb pcb_t;
+
+/* Structure to represent a frame in memory */
+typedef struct {
+	uint32_t page_number;
+	uint64_t time_loaded;
+	uint64_t time_used;
+	bool used;
+	bool empty;
+} frame_t;
 
 /* void function pointer used to store function calls for traps */
 typedef void (*trap)();
