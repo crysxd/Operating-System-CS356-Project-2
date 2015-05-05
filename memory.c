@@ -8,18 +8,18 @@
 
 /* Define in header declared fields */
 trap memory_page_fault = NULL;
-frame_t *memory_map = NULL;
+frame_t *inverted_page_table = NULL;
 uint64_t page_faults = 0;
 
 /* This method should be called once at atrup as it is emptying the entire 
    memory */
 void memory_init() {
 	/* Create memory map */
-	memory_map = malloc(sizeof(frame_t) * MEMORY_FRAME_COUNT);
+	inverted_page_table = malloc(sizeof(frame_t) * MEMORY_FRAME_COUNT);
 
-	/* Iterate over memory_map and set default values */
+	/* Iterate over inverted_page_table and set default values */
 	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
-		memory_map[i].empty = true;
+		inverted_page_table[i].empty = true;
 	}
 }
 
@@ -29,11 +29,11 @@ bool memory_access(uint32_t address) {
 	uint32_t frame = 0;
 	bool page_found = false;
 
-	/* Iterate over memory_map and search for frame */
+	/* Iterate over inverted_page_table and search for frame */
 	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
-		if(!memory_map[i].empty && 
-			memory_map[i].page_number == address &&
-			memory_map[i].owner_pid == scheduler_running->pid) {
+		if(!inverted_page_table[i].empty && 
+			inverted_page_table[i].page_number == address &&
+			inverted_page_table[i].owner_pid == scheduler_running->pid) {
 			frame = i;
 			page_found = true;
 		}
@@ -49,8 +49,8 @@ bool memory_access(uint32_t address) {
 
 	/* If we found it, update last access time and set used to true */
 	else {
-		memory_map[frame].time_used = cpu_time;
-		memory_map[frame].used = true;
+		inverted_page_table[frame].time_used = cpu_time;
+		inverted_page_table[frame].used = true;
 		return false;
 	}
 }

@@ -87,22 +87,24 @@ void pager_perform_next_load() {
 	uint32_t i = 0;
 	for(i=0; i<MEMORY_FRAME_COUNT; i++) {
 		/* If there is an empty frame, cancel search and use it */
-		if(memory_map[i].empty == true) {
+		if(inverted_page_table[i].empty == true) {
 			frame_to_replace = i;
+			printf("[PAGER] Found empty frame at position %d\n", i);
 			break;
 		}
 
 		/* If we use FIFO alogrithm, search for the oldest frame */
 		#ifdef PAGER_ALGORITHM_FIFO
-		if(memory_map[i].time_loaded <
-			memory_map[frame_to_replace].time_loaded) {
+		if(inverted_page_table[i].time_loaded <
+			inverted_page_table[frame_to_replace].time_loaded) {
 			frame_to_replace = i;
 		}
 		#endif
 
 		/* If we use LRU algorithm, search for the last recently used frame */
 		#ifdef PAGER_ALGORITHM_LRU
-		if(memory_map[i].time_use < memory_map[frame_to_replace].time_use) {
+		if(inverted_page_table[i].time_used < 
+			inverted_page_table[frame_to_replace].time_used) {
 			frame_to_replace = i;
 		}
 		#endif
@@ -112,10 +114,10 @@ void pager_perform_next_load() {
 		#ifdef PAGER_ALGORITHM_SC
 		uint32_t oldest_page = frame_to_replace;
 		for(uint32_t j=0; j<MEMORY_FRAME_COUNT; j++) {
-			if(memory_map[j].time_loaded <
-				memory_map[oldest_page].time_loaded && 
-				memory_map[j].time_loaded >= 
-				memory_map[frame_to_replace].time_loaded) {
+			if(inverted_page_table[j].time_loaded <
+				inverted_page_table[oldest_page].time_loaded && 
+				inverted_page_table[j].time_loaded >= 
+				inverted_page_table[frame_to_replace].time_loaded) {
 					oldest_page = j;
 			}
 		}
@@ -129,12 +131,12 @@ void pager_perform_next_load() {
 		}
 
 		/* If the used bit is not set, we found our victim */
-		if(memory_map[oldest_page].used == false) {
+		if(inverted_page_table[oldest_page].used == false) {
 			break;
 		}
 
 		/* Clear used bit */
-		memory_map[frame_to_replace].used = false;
+		inverted_page_table[frame_to_replace].used = false;
 		#endif
 
 		#ifdef PAGER_ALGORITHM_OPT
@@ -149,15 +151,17 @@ void pager_perform_next_load() {
 		}
 	#endif
 
+	printf("[PAGER] Replacing page in frame %d\n", frame_to_replace);
+
 	/* replace frame */
-	memory_map[frame_to_replace].owner_pid = 
+	inverted_page_table[frame_to_replace].owner_pid = 
 		load_request_queue_head->process->pid;
-	memory_map[frame_to_replace].page_number = 
+	inverted_page_table[frame_to_replace].page_number = 
 		load_request_queue_head->process->instruction_pointer->address;
-	memory_map[frame_to_replace].time_loaded = cpu_time + 1000;
-	memory_map[frame_to_replace].time_used = cpu_time + 1000;
-	memory_map[frame_to_replace].used = false;
-	memory_map[frame_to_replace].empty = false;
+	inverted_page_table[frame_to_replace].time_loaded = cpu_time + 1000;
+	inverted_page_table[frame_to_replace].time_used = cpu_time + 1000;
+	inverted_page_table[frame_to_replace].used = false;
+	inverted_page_table[frame_to_replace].empty = false;
 
 	/* Consume the next 1000 ticks */
 	pager_consume_ticks = 10;

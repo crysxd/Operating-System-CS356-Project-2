@@ -26,7 +26,7 @@ extern uint64_t page_faults;
 extern trap memory_page_fault;
 
 /* The page table */
-extern frame_t *memory_map;
+extern frame_t *inverted_page_table;
 
 /* This method should be called once at atrup as it is emptying the entire 
    memory */
@@ -35,5 +35,6 @@ void memory_init();
 /* Accesess the memory and raises a page fault if the requested page is not 
    in memory */
 bool memory_access(uint32_t address);
+
 
 #endif
