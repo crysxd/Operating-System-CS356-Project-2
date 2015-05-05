@@ -19,6 +19,9 @@
 extern uint64_t cpu_time;
 extern pcb_t *scheduler_running;
 
+/* Counter for page faults */
+extern uint64_t page_faults;
+
 /* Trap if a page fault happens */
 extern trap memory_page_fault;
 
