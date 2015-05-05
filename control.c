@@ -71,6 +71,7 @@ void control_create_process_arrival_queue(char *trace_file_name) {
 	/* Iterate over all lines */
 	char line[1024];
 	int32_t line_result = 0;
+	uint32_t pid_counter = 0;
 
 	for(;;) {
 		/* Read current line */
@@ -111,6 +112,7 @@ void control_create_process_arrival_queue(char *trace_file_name) {
     	/* Create new pcb and fill in information */
     	pcb_t *pcb = malloc(sizeof(pcb_t));
     	pcb->name = malloc(strlen(values[0]));
+    	pcb->pid = pid_counter++;
     	memcpy(pcb->name, values, strlen(values[0])+1);
     	pcb->cpu_time = SECS_TO_TICKS(atof(values[2]));
     	pcb->start_time = SECS_TO_TICKS(atof(values[1]));

@@ -24,6 +24,7 @@ typedef struct instruction instruction_t;
 /* pcb_t is a structure representing a simple process control block */
 struct pcb {
 	char *name;
+	uint32_t pid;
 	uint64_t cpu_time;
 	uint64_t start_time;
 	uint64_t waiting_time;
