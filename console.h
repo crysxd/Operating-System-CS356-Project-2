@@ -17,6 +17,9 @@ extern bool verbose_mode;
 /* Prints a log message. Logs will only be printed if verbose mode is enabled */
 void console_log(const char *composer, const char *format, ...);
 
+/* Prints a log message, will also be printed if verbose mode is disabled */
+void console_log_force(const char *composer, const char *format, ...);
+
 /* Prints an error message, will also be printed if verbose mode is disabled */
 void console_error(const char *composer, const char *format, ...);
 
