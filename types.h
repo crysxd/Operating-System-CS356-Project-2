@@ -37,6 +37,7 @@ typedef struct pcb pcb_t;
 
 /* Structure to represent a frame in memory */
 typedef struct {
+	uint32_t owner_pid;
 	uint32_t page_number;
 	uint64_t time_loaded;
 	uint64_t time_used;

@@ -31,7 +31,8 @@ bool memory_access(uint32_t address) {
 	/* Iterate over memory_map and search for frame */
 	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
 		if(!memory_map[i].empty && 
-			memory_map[i].page_number == address) {
+			memory_map[i].page_number == address &&
+			memory_map[i].owner_pid == scheduler_running->pid) {
 			frame = i;
 			page_found = true;
 		}

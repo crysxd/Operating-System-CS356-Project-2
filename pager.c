@@ -150,6 +150,8 @@ void pager_perform_next_load() {
 	#endif
 
 	/* replace frame */
+	memory_map[frame_to_replace].owner_pid = 
+		load_request_queue_head->process->pid;
 	memory_map[frame_to_replace].page_number = 
 		load_request_queue_head->process->instruction_pointer->address;
 	memory_map[frame_to_replace].time_loaded = cpu_time + 1000;

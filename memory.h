@@ -17,6 +17,7 @@
 
 /* Include needed variables */
 extern uint64_t cpu_time;
+extern pcb_t *scheduler_running;
 
 /* Trap if a page fault happens */
 extern trap memory_page_fault;
