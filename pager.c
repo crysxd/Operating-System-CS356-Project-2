@@ -76,6 +76,9 @@ void pager_perform_next_load() {
 	printf("[PAGER] Loading page %d\n", 
 		load_request_queue_head->process->instruction_pointer->address);
 
+	/* Print page table */
+	print_inverted_page_table();
+	
 	/* Special field needed for LRU algorithm */
 	#ifdef PAGER_ALGORITHM_SC
 		uint32_t absolute_oldest_page = 0;
