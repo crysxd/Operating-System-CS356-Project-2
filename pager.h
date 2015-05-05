@@ -13,7 +13,7 @@
 #include "scheduler.h"
 #include "memory.h"
 
-#define PAGER_ALGORITHM_LRU
+#define PAGER_ALGORITHM_SC
 
 static uint64_t pager_consume_ticks = 0;
 

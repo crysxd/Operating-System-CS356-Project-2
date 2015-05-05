@@ -50,7 +50,13 @@ bool memory_access(uint32_t address) {
 	/* If we found it, update last access time and set used to true */
 	else {
 		inverted_page_table[frame].time_used = cpu_time;
-		inverted_page_table[frame].used = true;
+
+		/* Only set used flag for SC if the page was used since the load time */
+		if(inverted_page_table[frame].used_since_load) {
+			inverted_page_table[frame].used = true;
+		}
+		
+		inverted_page_table[frame].used_since_load = true;
 		return false;
 	}
 }

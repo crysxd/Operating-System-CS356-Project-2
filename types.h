@@ -44,6 +44,7 @@ typedef struct {
 	uint64_t time_loaded;
 	uint64_t time_used;
 	bool used;
+	bool used_since_load;
 	bool empty;
 } frame_t;
 

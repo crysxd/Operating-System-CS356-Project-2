@@ -79,11 +79,15 @@ void pager_perform_next_load() {
 	/* Print page table */
 	print_inverted_page_table();
 
-	/* Special field needed for LRU algorithm */
+	/* If we use SC algorithm, create a array to store the page numbers and
+	   fill it with every possible frame number */
 	#ifdef PAGER_ALGORITHM_SC
-		uint32_t absolute_oldest_page = 0;
+	uint32_t pages_sorted[MEMORY_FRAME_COUNT];
+	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+		pages_sorted[i] = i;
+	}
 	#endif
-	
+
 	/* Search for a free frame or the frame to replace. The replacement function
 	   is based on which preprocessor directive is defined */
 	uint32_t frame_to_replace = 0;
@@ -112,48 +116,47 @@ void pager_perform_next_load() {
 		}
 		#endif
 
-		/* If we use SC, iterate over all frames and find the oldest one with a 
-		   cleared used bit */
+		/* If we use SC, make a default bubble sort and store only the index of
+		   the sorted pages in pages_sorted */
 		#ifdef PAGER_ALGORITHM_SC
-		uint32_t oldest_page = frame_to_replace;
-		for(uint32_t j=0; j<MEMORY_FRAME_COUNT; j++) {
-			if(inverted_page_table[j].time_loaded <
-				inverted_page_table[oldest_page].time_loaded && 
-				inverted_page_table[j].time_loaded >= 
-				inverted_page_table[frame_to_replace].time_loaded) {
-					oldest_page = j;
+		for(uint32_t j=0; j<MEMORY_FRAME_COUNT-1; j++) {
+			/* Compare the load times and switch the indexes stored in 
+			   pages_sorted */
+			if(inverted_page_table[pages_sorted[j]].time_loaded >
+			inverted_page_table[pages_sorted[j+1]].time_loaded) {
+				uint32_t buf = pages_sorted[j];
+				pages_sorted[j] = pages_sorted[j+1];
+				pages_sorted[j+1] = buf;
 			}
 		}
-
-		/* Save as frame to replace */
-		frame_to_replace = oldest_page;
-
-		/* Save the frame as absolut oldest if we are in the first iteration */
-		if(i == 0) {
-			absolute_oldest_page = oldest_page;
-		}
-
-		/* If the used bit is not set, we found our victim */
-		if(inverted_page_table[oldest_page].used == false) {
-			break;
-		}
-
-		/* Clear used bit */
-		inverted_page_table[frame_to_replace].used = false;
 		#endif
 
 		#ifdef PAGER_ALGORITHM_OPT
 		#endif
 	}
 
-	/* If we used SC algorithm and there was no break, we must use the absolut
-	   oldest page (this happens when all used bits are set) */
 	#ifdef PAGER_ALGORITHM_SC
-		if(i == MEMORY_FRAME_COUNT) {
-			frame_to_replace = absolute_oldest_page;
+	/* If there was no break (no empty page found) */
+	if(i == MEMORY_FRAME_COUNT) {
+		/* Search for the oldest page with used flag not set */
+		for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+			/* If the use flag is set, delete it. A second chance was granted */
+			if(inverted_page_table[pages_sorted[i]].used) {
+				inverted_page_table[pages_sorted[i]].used = false;
+				printf("[PAGER] Granting page in frame %d a second chance\n", 
+					pages_sorted[i]);
+			} 
+
+			/* Oldest page with deleted used flag found */
+			else {
+				frame_to_replace = pages_sorted[i];
+				break;
+			}
 		}
+	}
 	#endif
 
+	/* Print status */
 	printf("[PAGER] Replacing page in frame %d\n", frame_to_replace);
 
 	/* replace frame */
@@ -166,7 +169,11 @@ void pager_perform_next_load() {
 	inverted_page_table[frame_to_replace].time_used = 
 		cpu_time + PAGER_REPLACE_TIME;
 	inverted_page_table[frame_to_replace].used = false;
+	inverted_page_table[frame_to_replace].used_since_load = false;
 	inverted_page_table[frame_to_replace].empty = false;
+
+	/* Print page table */
+	print_inverted_page_table();
 
 	/* Consume the next 1000 ticks */
 	pager_consume_ticks = PAGER_REPLACE_TIME;
