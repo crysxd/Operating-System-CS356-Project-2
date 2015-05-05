@@ -7,12 +7,12 @@
 #include "console.h"
 
 /* Definition iof fields declared in header */
-bool verbose_mode = true;
+bool console_verbose_mode = false;
 
 /* Prints a log message. Logs will only be printed if verbose mode is enabled */
 void console_log(const char *composer, const char *format, ...) {
 	/* Cancel if verbose mode is disabled */
-	if(!verbose_mode) {
+	if(!console_verbose_mode) {
 		return;
 	}
 

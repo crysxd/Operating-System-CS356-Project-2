@@ -12,7 +12,7 @@
 #include <stdbool.h>
 
 /* Declaration of flag for verbose output mode */
-extern bool verbose_mode;
+extern bool console_verbose_mode;
 
 /* Prints a log message. Logs will only be printed if verbose mode is enabled */
 void console_log(const char *composer, const char *format, ...);
