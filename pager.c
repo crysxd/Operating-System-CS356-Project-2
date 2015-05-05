@@ -78,7 +78,7 @@ void pager_perform_next_load() {
 
 	/* Print page table */
 	print_inverted_page_table();
-	
+
 	/* Special field needed for LRU algorithm */
 	#ifdef PAGER_ALGORITHM_SC
 		uint32_t absolute_oldest_page = 0;
@@ -161,11 +161,13 @@ void pager_perform_next_load() {
 		load_request_queue_head->process->pid;
 	inverted_page_table[frame_to_replace].page_number = 
 		load_request_queue_head->process->instruction_pointer->address;
-	inverted_page_table[frame_to_replace].time_loaded = cpu_time + 1000;
-	inverted_page_table[frame_to_replace].time_used = cpu_time + 1000;
+	inverted_page_table[frame_to_replace].time_loaded = 
+		cpu_time + PAGER_REPLACE_TIME;
+	inverted_page_table[frame_to_replace].time_used = 
+		cpu_time + PAGER_REPLACE_TIME;
 	inverted_page_table[frame_to_replace].used = false;
 	inverted_page_table[frame_to_replace].empty = false;
 
 	/* Consume the next 1000 ticks */
-	pager_consume_ticks = 10;
+	pager_consume_ticks = PAGER_REPLACE_TIME;
 }
