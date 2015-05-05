@@ -23,7 +23,7 @@ static pcb_t *ready_queue_head = NULL;
 static pcb_t *ready_queue_tail = NULL;
 static pcb_t *blocked_list_head = NULL;
 static pcb_t *blocked_list_tail = NULL;
-static pcb_t *running = NULL;
+extern pcb_t *scheduler_running;
 
 /* Couter to use ticks for context switch */
 static uint64_t scheduler_consume_ticks = 0;
