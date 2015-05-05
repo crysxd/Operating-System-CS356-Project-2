@@ -59,6 +59,19 @@ int main(int argc, char **argv) {
 		cpu_time++;
 		//usleep(100000);
 	}
+
+	/* Print results */
+	if(console_verbose_mode) {
+		console_log_force("RESULT", 
+			"================================================================" 
+			"===============");
+	}
+	console_log_force("RESULT", "%-20s %" PRIu64, 
+		"Total CPU time:", cpu_time-1);
+	console_log_force("RESULT", "%-20s %" PRIu64, 
+		"Total page faults:", memory_page_faults);
+	console_log_force("RESULT", "%-20s %" PRIu64, 
+		"Total cpu idle time:", cpu_stall_counter);	
 }
 
 /* Loads the process file and puts the proceeses into 
