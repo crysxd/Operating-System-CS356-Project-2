@@ -61,11 +61,9 @@ int main(int argc, char **argv) {
 	}
 
 	/* Print results */
-	if(console_verbose_mode) {
-		console_log_force("RESULT", 
+	console_log("RESULT", 
 			"================================================================" 
 			"===============");
-	}
 	console_log_force("RESULT", "%-20s %" PRIu64, 
 		"Total CPU time:", cpu_time-1);
 	console_log_force("RESULT", "%-20s %" PRIu64, 
@@ -134,7 +132,7 @@ void control_create_process_arrival_queue(char *trace_file_name) {
     	pcb->name = malloc(strlen(values[0]));
     	pcb->pid = pid_counter++;
     	memcpy(pcb->name, values, strlen(values[0])+1);
-    	pcb->cpu_time = SECS_TO_TICKS(atof(values[2]));
+    	pcb->cpu_time = 0;
     	pcb->start_time = SECS_TO_TICKS(atof(values[1]));
     	pcb->waiting_time = 0;
     	pcb->io_count = atof(values[3]);
