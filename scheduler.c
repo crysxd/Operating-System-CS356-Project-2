@@ -186,16 +186,23 @@ void scheduler_move_process_to_ready_queue_tail(pcb_t *process) {
 
 /* Prints all elements of the list */
 void print_list(pcb_t *list_head, char *list_name) {
-	printf("%s:\n", list_name);
-	printf("-----------------------------------------------------\n");
+	printf("[CPU] %s:\n", list_name);
+	printf("-------------------------------------------------------------------------------\n");
+	printf("| %-10s | %-10s | %-10s | %-10s | %-10s | %-10s |\n",
+		"PID", "Name", "Start Time", "CPU Time", "Wait Time", "Page Fault");
+	printf("-------------------------------------------------------------------------------\n");
 	while(list_head != NULL) {
-		printf("| %-10s | %-10" PRIu64 " | %-10" PRIu64 " | %-10" PRIu64 " |\n", 
-			list_head->name, list_head->start_time, 
-			list_head->cpu_time, list_head->io_count);
+		printf("| %-10" PRIu32" | %-10s | %-10" PRIu64 " | %-10" PRIu64 " | %-10" PRIu64 " | %-10" PRIu64 " |\n", 
+			list_head->pid,
+			list_head->name, 
+			list_head->start_time,
+			list_head->cpu_time,
+			list_head->waiting_time,
+			list_head->page_faults);
 
 		list_head = list_head->next;
 	}
-	printf("-----------------------------------------------------\n");
+	printf("-------------------------------------------------------------------------------\n");
 }
 
 /* Checks if there are un finished processes */
