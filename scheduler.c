@@ -79,6 +79,9 @@ void scheduler_trap_page_fault() {
 	printf("[SCHEDULER] Page fault for page %d\n", 
 		scheduler_running->instruction_pointer->address);
 
+	/* Increase page fault counter */
+	scheduler_running->page_faults++;
+
 	/* Call pager to load the needed page, will block the running process and
 	   so cause resheduling */
 	pager_load(scheduler_running);

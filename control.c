@@ -118,6 +118,7 @@ void control_create_process_arrival_queue(char *trace_file_name) {
     	pcb->start_time = SECS_TO_TICKS(atof(values[1]));
     	pcb->waiting_time = 0;
     	pcb->io_count = atof(values[3]);
+    	pcb->page_faults = 0;
     	pcb->end_time = -1;
     	pcb->instruction_pointer = NULL;
     	pcb->next = NULL;

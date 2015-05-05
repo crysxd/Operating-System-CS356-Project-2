@@ -30,6 +30,7 @@ struct pcb {
 	uint64_t waiting_time;
 	uint64_t end_time;
 	uint64_t io_count;
+	uint64_t page_faults;
 	instruction_t *instruction_pointer;
 	struct pcb *next;
 };
