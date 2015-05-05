@@ -8,7 +8,7 @@
 
 /* Define in header declared fields */
 trap memory_page_fault = NULL;
-frame_t *memory_map;
+frame_t *memory_map = NULL;
 
 /* This method should be called once at atrup as it is emptying the entire 
    memory */
