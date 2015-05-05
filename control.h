@@ -16,6 +16,7 @@
 #include "memory.h"
 #include "pager.h"
 #include "error_codes.h"
+#include "console.h"
 
 /* Queue for arriving procesess. Feed from trace file */ 
 static pcb_t *process_queue_head = NULL;

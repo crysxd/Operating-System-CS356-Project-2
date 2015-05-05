@@ -15,8 +15,9 @@ pcb_t *scheduler_running = NULL;
 bool scheduler_tick() {
 	if(scheduler_consume_ticks > 0) {
 		scheduler_consume_ticks--;
-		printf("[SCHEDULER] Performing context switch, %" PRIu64 " ticks left\n"
-			, scheduler_consume_ticks);
+		console_log("SCHEDULER", 
+			"Performing context switch, %" PRIu64 " ticks left", 
+			scheduler_consume_ticks);
 		return false;
 	}
 
@@ -29,7 +30,7 @@ void scheduler_add_process(pcb_t *process) {
 	scheduler_move_process_to_ready_queue_tail(process);
 
 	/* Print status */
-	printf("[SCHEDULER] Added new process \"%s\"\n", process->name);
+	console_log("SCHEDULER", "Added new process \"%s\"", process->name);
 
 	/* Start scheduling if there is no process running */
 	if(scheduler_running == NULL) {
@@ -43,12 +44,12 @@ void scheduler_perform_scheduling() {
 	if(ready_queue_head == NULL) {
 		scheduler_running = NULL;
 		cpu_preempt();
-		printf("[SCHEDULER] Queue is empty!\n");
+		console_log("SCHEDULER", "Queue is empty!");
 		return;
 	}
 
 
-	printf("[SCHEDULER] Scheduling, current queue:\n");
+	console_log("SCHEDULER", "Scheduling, current queue:");
 	print_list(ready_queue_head, "ready_queue");
 
 	/* Reset CPU timer to guarantee that the control is given back to the 
@@ -56,7 +57,7 @@ void scheduler_perform_scheduling() {
 	cpu_register_tmr = scheduler_rr_quantum;
 
 	if(scheduler_running == ready_queue_head) {
-		printf("[SCHEDULER] Process \"%s\" is allowed to stay on CPU!\n", 
+		console_log("SCHEDULER", "Process \"%s\" is allowed to stay on CPU!", 
 			scheduler_running->name);
 		return;
 	}
@@ -65,7 +66,8 @@ void scheduler_perform_scheduling() {
 	scheduler_running = ready_queue_head;
 	cpu_run(&scheduler_running->instruction_pointer);
 
-	printf("[SCHEDULER] Put process \"%s\" on CPU\n", scheduler_running->name);
+	console_log("SCHEDULER", "Put process \"%s\" on CPU", 
+		scheduler_running->name);
 
 	/* Move the beginning of the beginning of the queue to the next element */
 	ready_queue_head = ready_queue_head->next;
@@ -76,7 +78,7 @@ void scheduler_perform_scheduling() {
 
 /* Function called by cpu when a page_fault happend */
 void scheduler_trap_page_fault() {
-	printf("[SCHEDULER] Page fault for page %d\n", 
+	console_log("SCHEDULER", "Page fault for page %d", 
 		scheduler_running->instruction_pointer->address);
 
 	/* Increase page fault counter */
@@ -90,14 +92,15 @@ void scheduler_trap_page_fault() {
 
 /* Function called by cpu when a context switch should be performed */
 void scheduler_trap_context_switch() {
-	printf("[SCHEDULER] Trap context switch running...\n");
+	console_log("SCHEDULER", "Trap context switch running...");
 
 	/* If the process is not finished yet, put it back to the ready queue. Else
 	   free its memory and delete it */
 	if(scheduler_running->instruction_pointer != NULL) {
 		scheduler_move_process_to_ready_queue_tail(scheduler_running);
 	} else {
-		printf("[SCHEDULER] Process \"%s\" is done.\n", scheduler_running->name);
+		console_log("SCHEDULER", "Process \"%s\" is done.", 
+			scheduler_running->name);
 		free(scheduler_running->name);
 		free(scheduler_running);
 	}
@@ -109,8 +112,7 @@ void scheduler_trap_context_switch() {
 /* Used to move the currently running process from the ready to 
    the blocked list */
 void scheduler_block() {
-	printf("[SCHEDULER] \"%s\" is blocked\n", 
-		scheduler_running->name);
+	console_log("SCHEDULER", "\"%s\" is blocked", scheduler_running->name);
 
 	/* Append the process to the list of blocked processes or set as head if
 	   list is empty */
@@ -130,8 +132,7 @@ void scheduler_block() {
 
 /* Used to move a process from the blocked to the ready queue */;
 void scheduler_ready(pcb_t *process) {
-	printf("[SCHEDULER] \"%s\" is runnable\n", 
-		process->name);
+	console_log("SCHEDULER", "\"%s\" is runnable", process->name);
 
 	/* If process is the head of the blocked list, replace the head */
 	if(blocked_list_head == process) {
@@ -186,13 +187,18 @@ void scheduler_move_process_to_ready_queue_tail(pcb_t *process) {
 
 /* Prints all elements of the list */
 void print_list(pcb_t *list_head, char *list_name) {
-	printf("[CPU] %s:\n", list_name);
-	printf("-------------------------------------------------------------------------------\n");
-	printf("| %-10s | %-10s | %-10s | %-10s | %-10s | %-10s |\n",
+	console_log("SCHEDULER", "%s:", list_name);
+	console_log("SCHEDULER", 
+		"-------------------------------------------------------------------------------");
+	console_log("SCHEDULER",
+		"| %-10s | %-10s | %-10s | %-10s | %-10s | %-10s |",
 		"PID", "Name", "Start Time", "CPU Time", "Wait Time", "Page Fault");
-	printf("-------------------------------------------------------------------------------\n");
+	console_log("SCHEDULER", 
+		"-------------------------------------------------------------------------------");
 	while(list_head != NULL) {
-		printf("| %-10" PRIu32" | %-10s | %-10" PRIu64 " | %-10" PRIu64 " | %-10" PRIu64 " | %-10" PRIu64 " |\n", 
+		console_log("SCHEDULER", 
+			"| %-10" PRIu32 " | %-10s | %-10" PRIu64 " | %-10" PRIu64 " "
+			"| %-10" PRIu64 " | %-10" PRIu64 " |", 
 			list_head->pid,
 			list_head->name, 
 			list_head->start_time,
@@ -202,7 +208,8 @@ void print_list(pcb_t *list_head, char *list_name) {
 
 		list_head = list_head->next;
 	}
-	printf("-------------------------------------------------------------------------------\n");
+	console_log("SCHEDULER", 
+		"-------------------------------------------------------------------------------");
 }
 
 /* Checks if there are un finished processes */

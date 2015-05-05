@@ -41,7 +41,7 @@ bool memory_access(uint32_t address) {
 
 	/* If we didn't find the page, it's a page fault */
 	if(!page_found) {
-		printf("[MEMORY] Page fault for page %d\n", address);
+		console_log("MEMORY", "Page fault for page %d", address);
 		page_faults++;
 		memory_page_fault();
 		return true;
@@ -55,7 +55,7 @@ bool memory_access(uint32_t address) {
 		if(inverted_page_table[frame].used_since_load) {
 			inverted_page_table[frame].used = true;
 		}
-		
+
 		inverted_page_table[frame].used_since_load = true;
 		return false;
 	}
@@ -63,23 +63,33 @@ bool memory_access(uint32_t address) {
 
 /* Prints a overview over the current inverted page table */
 void print_inverted_page_table() {
-	printf("[MEMORY] Current page table:\n");
-	printf("------------------------------------------------------------------\n");
-	printf("| %-10s | %-10s | %-10s | %-10s | %-10s |\n",
-		"Frame", "PID", "Loaded", "Last used", "SC Bit");
-	printf("------------------------------------------------------------------\n");
+	console_log("MEMORY", "Current page table:");
+	console_log("MEMORY",
+		"----------------------------------------------------------------------"
+		"----------");
+	console_log("MEMORY", 
+		"| %-10s | %-10s | %-10s | %-10s | %-10s | %-10s |",
+		"Frame", "PID", "Loaded", "Last used", "SC Bit", "Empty Bit");
+	console_log("MEMORY", 
+		"----------------------------------------------------------------------"
+		"----------");
 
 	/* Iterate over tbale */
 	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
-		printf("| %-10d | %-10d | %-10" PRIu64 " | %-10" PRIu64 " | %-10d |\n",
+		console_log("MEMORY", 
+			"| %-10d | %-10d | %-10" PRIu64 " | %-10" PRIu64 " | %-10d | "
+			"%-10d |",
 			i,
 			inverted_page_table[i].owner_pid, 
 			inverted_page_table[i].time_loaded, 
 			inverted_page_table[i].time_used, 
-			inverted_page_table[i].used);
+			inverted_page_table[i].used,
+			inverted_page_table[i].empty);
 
 	}
 
-	printf("------------------------------------------------------------------\n");
+	console_log("MEMORY", 
+		"----------------------------------------------------------------------"
+		"----------");
 }
 

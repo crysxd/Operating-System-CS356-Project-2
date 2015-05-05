@@ -12,6 +12,7 @@
 #include "types.h"
 #include "scheduler.h"
 #include "memory.h"
+#include "console.h"
 
 #define PAGER_ALGORITHM_SC
 

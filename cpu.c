@@ -33,7 +33,7 @@ void cpu_tick() {
 	}
 
 	/* Access memory location */
-	printf("[CPU] Accessing %" PRIu32 "\n", (*cpu_register_ip)->address);
+	console_log("CPU", "Accessing %" PRIu32, (*cpu_register_ip)->address);
 	if(memory_access((*cpu_register_ip)->address)) {
 		return;
 	}
@@ -51,11 +51,11 @@ void cpu_tick() {
 	/* Decrease the timer */
 	if(cpu_register_tmr > 0) {
 		cpu_register_tmr--;
-		printf("[CPU] Timer: %" PRIu32 "\n", cpu_register_tmr);
+		console_log("CPU", "Timer: %" PRIu32, cpu_register_tmr);
 
 		/* If the timer is zero, fire the trap */
 		if(cpu_register_tmr == 0) {
-			printf("[CPU] Timer done!\n");
+			console_log("CPU", "Timer done!");
 			cpu_timer_done();
 		}
 	}
@@ -64,5 +64,5 @@ void cpu_tick() {
 /* Used to indicate a tick cannot be used */
 void cpu_stall_tick() {
 	cpu_stall_counter++;
-	printf("[CPU] Stall (%" PRIu64 ")\n", cpu_stall_counter);
+	console_log("CPU", "Stall (%" PRIu64 ")", cpu_stall_counter);
 }

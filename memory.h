@@ -12,6 +12,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include "types.h"
+#include "console.h"
 
 #define MEMORY_FRAME_COUNT 5
 

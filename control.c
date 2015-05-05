@@ -9,8 +9,9 @@
 int main(int argc, char **argv) {
 	/* Check argument count */
 	if(argc < 3) {
-		printf("Not enough arguments, usage: "
-			"simulator PATH_TO_PROCESS_TRACE PATH_TO_MEMORY_TRACES\n");
+		console_error("CONTROL", 
+			"Not enough arguments, usage: "
+			"simulator PATH_TO_PROCESS_TRACE PATH_TO_MEMORY_TRACES");
 		return ERR_NO_TOO_FEW_ARGS;
 	}
 
@@ -28,8 +29,11 @@ int main(int argc, char **argv) {
 
 	/* Perform ticks */
 	while(process_queue_head != NULL || !scheduler_all_processes_done()) {
-		printf("\n=============================\n"
-			"[CONTROL] CPU time: %" PRIu64 "\n", cpu_time);
+		console_log("CONTROL", 
+			"================================================================" 
+			"===============");
+		console_log("CONTROL", "CPU time: %" PRIu64, cpu_time);
+
 		/* Check if a new process arrives to the current time */
 		if(process_queue_head != NULL && 
 			process_queue_head->start_time == cpu_time) {
@@ -63,7 +67,8 @@ void control_create_process_arrival_queue(char *trace_file_name) {
 	/* Open file, handle errors */
 	FILE* trace_file;
 	if((trace_file = fopen(trace_file_name, "r")) == NULL) {
-		printf("ERROR: Unable to read process trace file \"%s\" (%s)",
+		console_error("CONTROL", 
+			"ERROR: Unable to read process trace file \"%s\" (%s)",
 			trace_file_name, strerror(errno));
 		exit(ERR_NO_UNABLE_OPEN_PROCESS_TRACE);
 	}
@@ -84,7 +89,8 @@ void control_create_process_arrival_queue(char *trace_file_name) {
 
 		/* If a negative value is returned, a error occured */
 		if(line_result < 0) {
-			printf("ERROR: Unable to read memory trace file \"%s\" (%s)",
+			console_error("CONTROL", 
+				"ERROR: Unable to read memory trace file \"%s\" (%s)",
 				trace_file_name, strerror(errno));
 			exit(ERR_NO_UNABLE_OPEN_MEMORY_TRACE);
 		}
@@ -98,8 +104,9 @@ void control_create_process_arrival_queue(char *trace_file_name) {
 
     		/* Handle error */
     		if(p == NULL) {
-    			printf("ERROR: error while parsing trace file! (%s)\n",
-						strerror(errno));
+    			console_error("CONTROL", 
+    				"ERROR: error while parsing trace file! (%s)",
+					strerror(errno));
     			exit(ERR_NO_PROCESS_TRACE_PARSE);
     		}
 
@@ -124,10 +131,11 @@ void control_create_process_arrival_queue(char *trace_file_name) {
     	pcb->next = NULL;
 
     	/* Print result */
-    	printf("SUCESS: created process control block for \"%s\"\n", pcb->name);
-    	printf("\tstart_time = %" PRIu64 "\n", pcb->start_time);
-		printf("\tcpu_time = %" PRIu64 "\n", pcb->cpu_time);
-		printf("\tio_count = %" PRIu64 "\n", pcb->io_count);
+    	console_log("CONTROL", 
+    		"SUCESS: created process control block for \"%s\"", pcb->name);
+    	console_log("CONTROL", "\tstart_time = %" PRIu64, pcb->start_time);
+		console_log("CONTROL", "\tcpu_time = %" PRIu64, pcb->cpu_time);
+		console_log("CONTROL", "\tio_count = %" PRIu64, pcb->io_count);
 
     	/* Link pcb to previous in queue or set as head if queue is empty */
     	if(process_queue_head == NULL) {
@@ -155,7 +163,8 @@ void control_load_memory_trace(pcb_t *process, char *dir) {
 	/* Open file */
 	FILE* trace_file;
 	if((trace_file = fopen(full_path, "r")) == NULL) {
-		printf("ERROR: Unable to read memory trace file \"%s\" (%s)",
+		console_error("CONTROL", 
+			"ERROR: Unable to read memory trace file \"%s\" (%s)",
 			full_path, strerror(errno));
 		exit(ERR_NO_UNABLE_OPEN_MEMORY_TRACE);
 	}
@@ -172,7 +181,8 @@ void control_load_memory_trace(pcb_t *process, char *dir) {
 
 		/* If a negative value is returned, a error occured */
 		if(line_result < 0) {
-			printf("ERROR: Unable to read memory trace file \"%s\" (%s)",
+			console_error("CONTROL", 
+				"ERROR: Unable to read memory trace file \"%s\" (%s)",
 				full_path, strerror(errno));
 			exit(ERR_NO_UNABLE_OPEN_MEMORY_TRACE);
 		}

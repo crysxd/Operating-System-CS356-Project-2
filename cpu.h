@@ -12,6 +12,7 @@
 #include <inttypes.h>
 #include "types.h"
 #include "memory.h"
+#include "console.h"
 
 /* Function pointer for differnt traps */
 extern trap cpu_context_switch;

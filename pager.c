@@ -12,7 +12,8 @@ void pager_tick() {
 		/* Consume one tick */
 		pager_consume_ticks--;
 
-		printf("[PAGER] %" PRIu64 " ticks left for current load operation\n", 
+		console_log("PAGER", 
+			"%" PRIu64 " ticks left for current load operation", 
 			pager_consume_ticks);
 
 		/* If the loading process id done */
@@ -35,7 +36,7 @@ void pager_tick() {
 
 /* Loads the page for the current instruction of the given process */
 void pager_load(pcb_t *process) {
-	printf("[PAGER] Request to load page %d\n", 
+		console_log("PAGER", "Request to load page %d", 
 		process->instruction_pointer->address);
 
 	/* Block the currently running process */
@@ -73,7 +74,7 @@ void pager_perform_next_load() {
 	}
 
 	/* Print status */
-	printf("[PAGER] Loading page %d\n", 
+	console_log("PAGER", "Loading page %d", 
 		load_request_queue_head->process->instruction_pointer->address);
 
 	/* Print page table */
@@ -96,7 +97,7 @@ void pager_perform_next_load() {
 		/* If there is an empty frame, cancel search and use it */
 		if(inverted_page_table[i].empty == true) {
 			frame_to_replace = i;
-			printf("[PAGER] Found empty frame at position %d\n", i);
+			console_log("PAGER", "Found empty frame at position %d", i);
 			break;
 		}
 
@@ -143,7 +144,8 @@ void pager_perform_next_load() {
 			/* If the use flag is set, delete it. A second chance was granted */
 			if(inverted_page_table[pages_sorted[i]].used) {
 				inverted_page_table[pages_sorted[i]].used = false;
-				printf("[PAGER] Granting page in frame %d a second chance\n", 
+				console_log("PAGER", 
+					"Granting page in frame %d a second chance", 
 					pages_sorted[i]);
 			} 
 
@@ -157,7 +159,7 @@ void pager_perform_next_load() {
 	#endif
 
 	/* Print status */
-	printf("[PAGER] Replacing page in frame %d\n", frame_to_replace);
+	console_log("PAGER", "Replacing page in frame %d", frame_to_replace);
 
 	/* replace frame */
 	inverted_page_table[frame_to_replace].owner_pid = 
