@@ -91,7 +91,7 @@ void scheduler_trap_context_switch() {
 
 	/* If the process is not finished yet, put it back to the ready queue. Else
 	   free its memory and delete it */
-	if(running->instruction_pointer != NULL) {
+	if(scheduler_running->instruction_pointer != NULL) {
 		scheduler_move_process_to_ready_queue_tail(scheduler_running);
 	} else {
 		printf("[SCHEDULER] Process \"%s\" is done.\n", scheduler_running->name);
