@@ -21,6 +21,11 @@ bool scheduler_tick() {
 		return false;
 	}
 
+	/* If there is something to execute for the CPU, increase cpu time */
+	if(cpu_register_ip != NULL) {
+		scheduler_running->cpu_time++;
+	}
+
 	return true;
 }
 
@@ -48,7 +53,6 @@ void scheduler_perform_scheduling() {
 		return;
 	}
 
-
 	console_log("SCHEDULER", "Scheduling, current queue:");
 	print_list(ready_queue_head, "ready_queue");
 
@@ -56,11 +60,14 @@ void scheduler_perform_scheduling() {
 	   scheduler after the time quantum is elapsed */
 	cpu_register_tmr = scheduler_rr_quantum;
 
+	/* If the process is allowed to stay one the cpu, 
+	   no context switch is needed */
 	if(scheduler_running == ready_queue_head) {
 		console_log("SCHEDULER", "Process \"%s\" is allowed to stay on CPU!", 
 			scheduler_running->name);
 		return;
 	}
+	
 
 	/* Put process on CPU and save to running */
 	scheduler_running = ready_queue_head;
@@ -73,7 +80,7 @@ void scheduler_perform_scheduling() {
 	ready_queue_head = ready_queue_head->next;
 
 	/* Consume the next 50 ticks to simulate context switching time */
-	scheduler_consume_ticks = 5;
+	scheduler_consume_ticks = SCHEDULER_CONTEXT_SWITCH_TIME;
 }
 
 /* Function called by cpu when a page_fault happend */
@@ -101,6 +108,27 @@ void scheduler_trap_context_switch() {
 	} else {
 		console_log("SCHEDULER", "Process \"%s\" is done.", 
 			scheduler_running->name);
+
+		/* Print results for process */
+		uint64_t turnaround_time = cpu_time - scheduler_running->start_time;
+		uint64_t waiting_time = turnaround_time - scheduler_running->cpu_time;
+		console_log_force("RESULT", "%-20s %s (pid: %" PRIu32 ")", 
+			"Name:", scheduler_running->name, scheduler_running->pid);
+		console_log_force("RESULT", "%-20s %" PRIu64, 
+			"Arrival time:", scheduler_running->start_time);
+		console_log_force("RESULT", "%-20s %" PRIu64, 
+			"Turnaround time:", turnaround_time);
+		console_log_force("RESULT", "%-20s %" PRIu64, 
+			"Waiting time:", waiting_time);
+		console_log_force("RESULT", "%-20s %" PRIu64, 
+			"CPU time:", scheduler_running->cpu_time);
+		console_log_force("RESULT", "%-20s %" PRIu64, 
+			"Page faults:", scheduler_running->page_faults);
+		console_log_force("RESULT", 
+			"================================================================" 
+			"===============");
+
+		/* Free data */
 		free(scheduler_running->name);
 		free(scheduler_running);
 	}
