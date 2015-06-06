@@ -6,6 +6,10 @@
 
 #include "pager.h"
 
+/* Definition of attributes declared in header */
+int32_t pager_page_replacement_algo = 0;
+
+/* Performs a tick */
 void pager_tick() {
 	/* If there are ticks to consume (meaning loading a page is in progress) */
 	if(pager_consume_ticks > 0) {
@@ -90,7 +94,7 @@ void pager_perform_next_load() {
 	#endif
 
 	/* Search for a free frame or the frame to replace. The replacement function
-	   is based on which preprocessor directive is defined */
+	   is based on which algorithm is used */
 	uint32_t frame_to_replace = 0;
 	uint32_t i = 0;
 	for(i=0; i<MEMORY_FRAME_COUNT; i++) {
@@ -102,61 +106,68 @@ void pager_perform_next_load() {
 		}
 
 		/* If we use FIFO alogrithm, search for the oldest frame */
-		#ifdef PAGER_ALGORITHM_FIFO
-		if(inverted_page_table[i].time_loaded <
-			inverted_page_table[frame_to_replace].time_loaded) {
-			frame_to_replace = i;
+		if(pager_page_replacement_algo == PAGER_ALGORITHM_FIFO) {
+			if(inverted_page_table[i].time_loaded <
+				inverted_page_table[frame_to_replace].time_loaded) {
+				frame_to_replace = i;
+			}
 		}
-		#endif
 
 		/* If we use LRU algorithm, search for the last recently used frame */
-		#ifdef PAGER_ALGORITHM_LRU
-		if(inverted_page_table[i].time_used < 
-			inverted_page_table[frame_to_replace].time_used) {
-			frame_to_replace = i;
+		else if(pager_page_replacement_algo == PAGER_ALGORITHM_LRU) {
+			if(inverted_page_table[i].time_used < 
+				inverted_page_table[frame_to_replace].time_used) {
+				frame_to_replace = i;
+			}
 		}
-		#endif
 
 		/* If we use SC, make a default bubble sort and store only the index of
 		   the sorted pages in pages_sorted */
-		#ifdef PAGER_ALGORITHM_SC
-		for(uint32_t j=0; j<MEMORY_FRAME_COUNT-1; j++) {
-			/* Compare the load times and switch the indexes stored in 
-			   pages_sorted */
-			if(inverted_page_table[pages_sorted[j]].time_loaded >
-			inverted_page_table[pages_sorted[j+1]].time_loaded) {
-				uint32_t buf = pages_sorted[j];
-				pages_sorted[j] = pages_sorted[j+1];
-				pages_sorted[j+1] = buf;
+		else if(pager_page_replacement_algo == PAGER_ALGORITHM_SC) {
+			for(uint32_t j=0; j<MEMORY_FRAME_COUNT-1; j++) {
+				/* Compare the load times and switch the indexes stored in 
+				   pages_sorted */
+				if(inverted_page_table[pages_sorted[j]].time_loaded >
+				inverted_page_table[pages_sorted[j+1]].time_loaded) {
+					uint32_t buf = pages_sorted[j];
+					pages_sorted[j] = pages_sorted[j+1];
+					pages_sorted[j+1] = buf;
+				}
 			}
 		}
-		#endif
 
-		#ifdef PAGER_ALGORITHM_OPT
-		#endif
+		/* Error case */
+		else {
+			/* Print error and exit */
+			console_error("PAGER", "Unknown page replacement algorithm: %d", 
+				pager_page_replacement_algo);
+			exit(ERR_NO_UNDEFINED_PAGE_REPLACEMENT_ALGORITHM);
+
+		}
 	}
 
-	#ifdef PAGER_ALGORITHM_SC
-	/* If there was no break (no empty page found) */
-	if(i == MEMORY_FRAME_COUNT) {
-		/* Search for the oldest page with used flag not set */
-		for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
-			/* If the use flag is set, delete it. A second chance was granted */
-			if(inverted_page_table[pages_sorted[i]].used) {
-				inverted_page_table[pages_sorted[i]].used = false;
-				console_log("PAGER", 
-					"Granting page in frame %d a second chance", 
-					pages_sorted[i]);
-			} 
+	/* If we use second chance algorithm */
+	if(pager_page_replacement_algo == PAGER_ALGORITHM_SC) {
+		/* If there was no break (no empty page found) */
+		if(i == MEMORY_FRAME_COUNT) {
+			/* Search for the oldest page with used flag not set */
+			for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+				/* If the use flag is set, delete it. A second chance was granted */
+				if(inverted_page_table[pages_sorted[i]].used) {
+					inverted_page_table[pages_sorted[i]].used = false;
+					console_log("PAGER", 
+						"Granting page in frame %d a second chance", 
+						pages_sorted[i]);
+				} 
 
-			/* Oldest page with deleted used flag found */
-			else {
-				frame_to_replace = pages_sorted[i];
-				break;
+				/* Oldest page with deleted used flag found */
+				else {
+					frame_to_replace = pages_sorted[i];
+					break;
+				}
 			}
 		}
 	}
-	#endif
 
 	/* Print status */
 	console_log("PAGER", "Replacing page in frame %d", frame_to_replace);

@@ -8,11 +8,27 @@
 
 int main(int argc, char **argv) {
 	/* Check argument count */
-	if(argc < 3) {
+	if(argc < 5) {
 		console_error("CONTROL", 
 			"Not enough arguments, usage: "
-			"simulator PATH_TO_PROCESS_TRACE PATH_TO_MEMORY_TRACES");
+			"mem‐sim pages quantum pr‐policy trace‐file [verbose]");
 		return ERR_NO_TOO_FEW_ARGS;
+	}
+
+	/* Parse all args */
+	uint32_t pages = atoi(argv[1]);
+	uint32_t quantum = atoi(argv[2]);
+	char *trace_file_name = argv[4];
+
+	/* Using strcmp to create a unique value for the page replacement algo */
+	console_error("CONTROL", "Use: %s", argv[3]);
+	switch(strcmp("fifo", argv[3])) {
+		case 0:  pager_page_replacement_algo = 0;  break;
+		case -6: pager_page_replacement_algo = -6; break;
+		case 52: pager_page_replacement_algo = 52; break;
+		default: console_error("CONTROL", 
+			"%s is not a valid page replacement algorithm", argv[3]);
+				return ERR_NO_UNDEFINED_PAGE_REPLACEMENT_ALGORITHM;
 	}
 
 	/* Set traps for cpu */
@@ -21,7 +37,7 @@ int main(int argc, char **argv) {
 	cpu_timer_done = &scheduler_trap_context_switch;
 
 	/* Read process trace */
-	control_create_process_arrival_queue(argv[1]);
+	control_create_process_arrival_queue(trace_file_name);
 	print_list(process_queue_head, "arrival_list");
 
 	/* Prepare memory */
@@ -40,7 +56,7 @@ int main(int argc, char **argv) {
 			/* Add it and remove it from the arrival queue */
 			pcb_t *p = process_queue_head;
 			process_queue_head = p->next;
-			control_load_memory_trace(p, argv[2]);
+			control_load_memory_trace(p, "");
 			scheduler_add_process(p);
 		}
 
@@ -169,7 +185,7 @@ void control_load_memory_trace(pcb_t *process, char *dir) {
 
 	/* Generate the full path */
 	char full_path[PATH_MAX];
-	sprintf(full_path, "%s/%s", dir, process->name);
+	sprintf(full_path, "%s%s", dir, process->name);
 
 	/* Open file */
 	FILE* trace_file;
