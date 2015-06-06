@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 
 	/* Parse all args */
 	memory_frame_count = atoi(argv[1]);
-	uint32_t quantum = atoi(argv[2]);
+	scheduler_rr_quantum = atoi(argv[2]);
 	char *trace_file_name = argv[4];
 
 	/* Using strcmp to create a unique value for the page replacement algo */
