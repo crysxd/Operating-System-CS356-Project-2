@@ -14,8 +14,6 @@
 #include "types.h"
 #include "console.h"
 
-#define MEMORY_FRAME_COUNT 5
-
 /* Include needed variables */
 extern uint64_t cpu_time;
 extern pcb_t *scheduler_running;
@@ -25,6 +23,9 @@ extern uint64_t memory_page_faults;
 
 /* Trap if a page fault happens */
 extern trap memory_page_fault;
+
+/* Number of available pages/frames */
+extern uint32_t memory_frame_count;
 
 /* The page table */
 extern frame_t *inverted_page_table;

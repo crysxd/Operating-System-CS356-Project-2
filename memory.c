@@ -10,15 +10,16 @@
 trap memory_page_fault = NULL;
 frame_t *inverted_page_table = NULL;
 uint64_t memory_page_faults = 0;
+uint32_t memory_frame_count = 0;
 
 /* This method should be called once at atrup as it is emptying the entire 
    memory */
 void memory_init() {
 	/* Create memory map */
-	inverted_page_table = malloc(sizeof(frame_t) * MEMORY_FRAME_COUNT);
+	inverted_page_table = malloc(sizeof(frame_t) * memory_frame_count);
 
 	/* Iterate over inverted_page_table and set default values */
-	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+	for(uint32_t i=0; i<memory_frame_count; i++) {
 		inverted_page_table[i].empty = true;
 	}
 }
@@ -30,7 +31,7 @@ bool memory_access(uint32_t address) {
 	bool page_found = false;
 
 	/* Iterate over inverted_page_table and search for frame */
-	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+	for(uint32_t i=0; i<memory_frame_count; i++) {
 		if(!inverted_page_table[i].empty && 
 			inverted_page_table[i].page_number == address &&
 			inverted_page_table[i].owner_pid == scheduler_running->pid) {
@@ -75,7 +76,7 @@ void print_inverted_page_table() {
 		"----------");
 
 	/* Iterate over tbale */
-	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+	for(uint32_t i=0; i<memory_frame_count; i++) {
 		console_log("MEMORY", 
 			"| %-10d | %-10d | %-10" PRIu64 " | %-10" PRIu64 " | %-10d | "
 			"%-10d |",

@@ -16,12 +16,11 @@ int main(int argc, char **argv) {
 	}
 
 	/* Parse all args */
-	uint32_t pages = atoi(argv[1]);
+	memory_frame_count = atoi(argv[1]);
 	uint32_t quantum = atoi(argv[2]);
 	char *trace_file_name = argv[4];
 
 	/* Using strcmp to create a unique value for the page replacement algo */
-	console_error("CONTROL", "Use: %s", argv[3]);
 	switch(strcmp("fifo", argv[3])) {
 		case 0:  pager_page_replacement_algo = 0;  break;
 		case -6: pager_page_replacement_algo = -6; break;

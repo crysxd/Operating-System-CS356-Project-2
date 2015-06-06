@@ -87,8 +87,8 @@ void pager_perform_next_load() {
 	/* If we use SC algorithm, create a array to store the page numbers and
 	   fill it with every possible frame number */
 	#ifdef PAGER_ALGORITHM_SC
-	uint32_t pages_sorted[MEMORY_FRAME_COUNT];
-	for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+	uint32_t pages_sorted[memory_frame_count];
+	for(uint32_t i=0; i<memory_frame_count; i++) {
 		pages_sorted[i] = i;
 	}
 	#endif
@@ -97,7 +97,7 @@ void pager_perform_next_load() {
 	   is based on which algorithm is used */
 	uint32_t frame_to_replace = 0;
 	uint32_t i = 0;
-	for(i=0; i<MEMORY_FRAME_COUNT; i++) {
+	for(i=0; i<memory_frame_count; i++) {
 		/* If there is an empty frame, cancel search and use it */
 		if(inverted_page_table[i].empty == true) {
 			frame_to_replace = i;
@@ -124,7 +124,7 @@ void pager_perform_next_load() {
 		/* If we use SC, make a default bubble sort and store only the index of
 		   the sorted pages in pages_sorted */
 		else if(pager_page_replacement_algo == PAGER_ALGORITHM_SC) {
-			for(uint32_t j=0; j<MEMORY_FRAME_COUNT-1; j++) {
+			for(uint32_t j=0; j<memory_frame_count-1; j++) {
 				/* Compare the load times and switch the indexes stored in 
 				   pages_sorted */
 				if(inverted_page_table[pages_sorted[j]].time_loaded >
@@ -149,9 +149,9 @@ void pager_perform_next_load() {
 	/* If we use second chance algorithm */
 	if(pager_page_replacement_algo == PAGER_ALGORITHM_SC) {
 		/* If there was no break (no empty page found) */
-		if(i == MEMORY_FRAME_COUNT) {
+		if(i == memory_frame_count) {
 			/* Search for the oldest page with used flag not set */
-			for(uint32_t i=0; i<MEMORY_FRAME_COUNT; i++) {
+			for(uint32_t i=0; i<memory_frame_count; i++) {
 				/* If the use flag is set, delete it. A second chance was granted */
 				if(inverted_page_table[pages_sorted[i]].used) {
 					inverted_page_table[pages_sorted[i]].used = false;
