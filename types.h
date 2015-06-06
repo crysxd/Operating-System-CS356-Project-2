@@ -13,8 +13,8 @@
 #define TICKS_PER_SEC 100.0
 #define SECS_TO_TICKS(x) x*TICKS_PER_SEC
 #define TICKS_TO_SECS(x) x/TICKS_PER_SEC
-#define PAGER_REPLACE_TIME 10
-#define SCHEDULER_CONTEXT_SWITCH_TIME 5
+#define PAGER_REPLACE_TIME 1000
+#define SCHEDULER_CONTEXT_SWITCH_TIME 50
 
 /* structure to make a linked list representing a memory trace file */
 struct instruction {
