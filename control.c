@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 	/* Prepare memory */
 	memory_init();
 
-	/* Perform ticks */
+	/* Perform ticks [MAIN LOOP] */
 	while(process_queue_head != NULL || !scheduler_all_processes_done()) {
 		console_log("CONTROL", 
 			"================================================================" 
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 
 		/* Increase CPU time */
 		cpu_time++;
-		//usleep(100000);
+
 	}
 
 	/* Print results */
