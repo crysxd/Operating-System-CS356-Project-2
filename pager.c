@@ -161,11 +161,19 @@ void pager_perform_next_load() {
 						pages_sorted[i]);
 				} 
 
-				/* Oldest page with deleted used flag found */
+				/* Oldest page with deleted used flag found, set i to 0 to 
+				   indicate a frame was found */
 				else {
+					i = 0;
 					frame_to_replace = pages_sorted[i];
 					break;
 				}
+			}
+
+			/* Special case, if all reference bits were set, use the oldest page */
+			if(i != 0) {
+				frame_to_replace = pages_sorted[0];
+				
 			}
 		}
 	}
