@@ -184,7 +184,7 @@ void control_load_memory_trace(pcb_t *process, char *dir) {
 
 	/* Generate the full path */
 	char full_path[PATH_MAX];
-	sprintf(full_path, "%s%s", dir, process->name);
+	sprintf(full_path, "%s%s.mem", dir, process->name);
 
 	/* Open file */
 	FILE* trace_file;
