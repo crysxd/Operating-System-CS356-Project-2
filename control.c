@@ -90,7 +90,8 @@ int main(int argc, char **argv) {
 		/* If step mode is enabled wait for confirm of user */
 		if(control_step_mode && skip_step_beaks == 0) {
 			/* Prompt */
-			console_log_force("CONTROL", "Press ENTER to continue");
+			console_log_force("CONTROL", "Press ENTER to continue or type a "
+				"number to skip more than one step");
 
 			/* Read line */
 			char input[64];
