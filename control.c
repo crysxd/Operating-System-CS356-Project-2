@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 	if(argc < 5) {
 		console_error("CONTROL", 
 			"Not enough arguments, usage: "
-			"mem‐sim pages quantum pr‐policy trace‐file [verbose]");
+			"mem‐sim pages quantum pr‐policy trace‐file [verbose [step]]");
 		return ERR_NO_TOO_FEW_ARGS;
 	}
 
