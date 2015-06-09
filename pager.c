@@ -155,6 +155,7 @@ void pager_perform_next_load() {
 				/* If the use flag is set, delete it. A second chance was granted */
 				if(inverted_page_table[pages_sorted[i]].used) {
 					inverted_page_table[pages_sorted[i]].used = false;
+					inverted_page_table[pages_sorted[i]].time_loaded = cpu_time;
 					console_log("PAGER", 
 						"Granting page in frame %d a second chance", 
 						pages_sorted[i]);

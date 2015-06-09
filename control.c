@@ -30,6 +30,18 @@ int main(int argc, char **argv) {
 				return ERR_NO_UNDEFINED_PAGE_REPLACEMENT_ALGORITHM;
 	}
 
+	/* If the 6. parameter is verbose, set verbose mode to true */
+	if(argc > 5 && strcmp(argv[5], "verbose") == 0) {
+		console_verbose_mode = true;
+		console_log("CONTORL", "Verbose mode is enabled");
+	}
+
+	/* If the 7. parameter is step, enable step mode */
+	if(argc > 6 && strcmp(argv[6], "step") == 0) {
+		control_step_mode = true;
+		console_log("CONTORL", "Step mode is enabled");
+	}
+
 	/* Set traps for cpu */
 	memory_page_fault = &scheduler_trap_page_fault;
 	cpu_context_switch = &scheduler_trap_context_switch;
@@ -41,6 +53,8 @@ int main(int argc, char **argv) {
 
 	/* Prepare memory */
 	memory_init();
+
+	uint64_t skip_step_beaks = 0;
 
 	/* Perform ticks [MAIN LOOP] */
 	while(process_queue_head != NULL || !scheduler_all_processes_done()) {
@@ -73,6 +87,32 @@ int main(int argc, char **argv) {
 		/* Increase CPU time */
 		cpu_time++;
 
+		/* If step mode is enabled wait for confirm of user */
+		if(control_step_mode && skip_step_beaks == 0) {
+			/* Prompt */
+			console_log_force("CONTROL", "Press ENTER to continue");
+
+			/* Read line */
+			char input[64];
+			uint8_t input_length = 0;
+
+			/* While not enter is pressed */
+			while((input[input_length++] = fgetc(stdin)) != '\n') {} 
+
+			/* Terminate string */
+			input[input_length-1] = 0;
+
+			/* If a number was typed, parse number and skip next steps */
+			if(input_length > 0) {
+				skip_step_beaks = atoi(input);
+
+			}
+		}
+
+		/* Decrement skip_step_beaks */
+		if(skip_step_beaks > 0) {
+			skip_step_beaks--;
+		}
 	}
 
 	/* Print results */
