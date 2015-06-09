@@ -23,6 +23,7 @@ static pcb_t *process_queue_head = NULL;
 static pcb_t *process_queue_tail = NULL;
 
 uint64_t cpu_time = 0;
+bool control_step_mode = false;
 
 /* Loads the process file and puts the proceeses into 
    process_queue_head */
