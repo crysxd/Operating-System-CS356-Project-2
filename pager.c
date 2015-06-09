@@ -84,14 +84,13 @@ void pager_perform_next_load() {
 	/* Print page table */
 	print_inverted_page_table();
 
-	/* If we use SC algorithm, create a array to store the page numbers and
-	   fill it with every possible frame number */
-	#ifdef PAGER_ALGORITHM_SC
+	/* Create a array to store the page numbers and
+	   fill it with every possible frame number.
+	   This is only needed for second chance algorithm. */
 	uint32_t pages_sorted[memory_frame_count];
 	for(uint32_t i=0; i<memory_frame_count; i++) {
 		pages_sorted[i] = i;
 	}
-	#endif
 
 	/* Search for a free frame or the frame to replace. The replacement function
 	   is based on which algorithm is used */
@@ -150,6 +149,9 @@ void pager_perform_next_load() {
 	if(pager_page_replacement_algo == PAGER_ALGORITHM_SC) {
 		/* If there was no break (no empty page found) */
 		if(i == memory_frame_count) {
+
+			bool page_found = false;
+
 			/* Search for the oldest page with used flag not set */
 			for(uint32_t i=0; i<memory_frame_count; i++) {
 				/* If the use flag is set, delete it. A second chance was granted */
@@ -161,11 +163,19 @@ void pager_perform_next_load() {
 						pages_sorted[i]);
 				} 
 
-				/* Oldest page with deleted used flag found */
+				/* Oldest page with deleted used flag found, set page_found to 
+				   indicate a frame was found */
 				else {
+					page_found = true;
 					frame_to_replace = pages_sorted[i];
 					break;
 				}
+			}
+
+			/* Special case, if all reference bits were set, use the oldest page */
+			if(!page_found) {
+				frame_to_replace = pages_sorted[0];
+				
 			}
 		}
 	}
