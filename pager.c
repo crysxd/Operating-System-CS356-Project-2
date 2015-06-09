@@ -149,6 +149,9 @@ void pager_perform_next_load() {
 	if(pager_page_replacement_algo == PAGER_ALGORITHM_SC) {
 		/* If there was no break (no empty page found) */
 		if(i == memory_frame_count) {
+
+			bool page_found = false;
+
 			/* Search for the oldest page with used flag not set */
 			for(uint32_t i=0; i<memory_frame_count; i++) {
 				/* If the use flag is set, delete it. A second chance was granted */
@@ -160,17 +163,17 @@ void pager_perform_next_load() {
 						pages_sorted[i]);
 				} 
 
-				/* Oldest page with deleted used flag found, set i to 0 to 
+				/* Oldest page with deleted used flag found, set page_found to 
 				   indicate a frame was found */
 				else {
-					i = 0;
+					page_found = true;
 					frame_to_replace = pages_sorted[i];
 					break;
 				}
 			}
 
 			/* Special case, if all reference bits were set, use the oldest page */
-			if(i != 0) {
+			if(!page_found) {
 				frame_to_replace = pages_sorted[0];
 				
 			}
