@@ -1,5 +1,6 @@
 # About
-Second project for "Project Workshop Operating Systems"
+Second project for "Project Workshop Operating Systems". The program can be used as followed:
+ mem‐sim pages quantum pr‐policy trace‐file [verbose [step]]
 
 # Problem Description
 CS356 Operating System Projects Spring 2015 Project 2: Simulating Virtual Memory and Scheduling
