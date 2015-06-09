@@ -67,20 +67,21 @@ void print_inverted_page_table() {
 	console_log("MEMORY", "Current page table:");
 	console_log("MEMORY",
 		"----------------------------------------------------------------------"
-		"----------");
+		"---------------------");
 	console_log("MEMORY", 
-		"| %-10s | %-10s | %-10s | %-10s | %-10s | %-10s |",
-		"Frame", "PID", "Loaded", "Last used", "SC Bit", "Empty Bit");
+		"| %-10s | %-10s | %-10s | %-10 | %-10s | %-10s | %-10s |",
+		"Frame", "Page", "PID", "Loaded", "Last used", "SC Bit", "Empty Bit");
 	console_log("MEMORY", 
 		"----------------------------------------------------------------------"
-		"----------");
-
+		"---------------------");
+		 
 	/* Iterate over tbale */
 	for(uint32_t i=0; i<memory_frame_count; i++) {
 		console_log("MEMORY", 
-			"| %-10d | %-10d | %-10" PRIu64 " | %-10" PRIu64 " | %-10d | "
+			"| %-10d | %-10d | %-10d | %-10" PRIu64 " | %-10" PRIu64 " | %-10d | "
 			"%-10d |",
 			i,
+			inverted_page_table[i].page_number, 
 			inverted_page_table[i].owner_pid, 
 			inverted_page_table[i].time_loaded, 
 			inverted_page_table[i].time_used, 
@@ -91,6 +92,6 @@ void print_inverted_page_table() {
 
 	console_log("MEMORY", 
 		"----------------------------------------------------------------------"
-		"----------");
+		"---------------------");
 }
 
