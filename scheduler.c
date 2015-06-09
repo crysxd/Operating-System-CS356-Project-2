@@ -46,6 +46,16 @@ void scheduler_add_process(pcb_t *process) {
 
 /* Used to trigger a new scheduling decision */
 void scheduler_perform_scheduling() {
+	/* This is a hot fix for a segmentation fault happening if an empty
+	   process is in the ready queue. Empty processes are skipped */
+	while(ready_queue_head != NULL && ready_queue_head->instruction_pointer == 0) {
+		console_error("SCHEDULER", "Found empty program in ready queue");
+		console_error("SCHEDULER", "Restoring from error state");
+		console_error("SCHEDULER", "Freeing and skipping %s", ready_queue_head->name);
+		ready_queue_head = ready_queue_head->next;
+	}
+
+	/* If the ready queue is empty, skip this scheduling time */
 	if(ready_queue_head == NULL) {
 		scheduler_running = NULL;
 		cpu_preempt();
@@ -79,6 +89,12 @@ void scheduler_perform_scheduling() {
 	/* Move the beginning of the beginning of the queue to the next element */
 	ready_queue_head = ready_queue_head->next;
 
+	/* Assure there is no loop */
+	if(ready_queue_head != NULL && ready_queue_head->next == ready_queue_head) {
+		console_error("SCHEDULER", "Loop in ready queue detected");
+		exit(0);
+	}
+
 	/* Consume the next 50 ticks to simulate context switching time */
 	scheduler_consume_ticks = SCHEDULER_CONTEXT_SWITCH_TIME;
 }
@@ -105,6 +121,7 @@ void scheduler_trap_context_switch() {
 	   free its memory and delete it */
 	if(scheduler_running->instruction_pointer != NULL) {
 		scheduler_move_process_to_ready_queue_tail(scheduler_running);
+
 	} else {
 		console_log("SCHEDULER", "Process \"%s\" is done.", 
 			scheduler_running->name);
@@ -129,8 +146,10 @@ void scheduler_trap_context_switch() {
 			"===============");
 
 		/* Free data */
+		console_log("SCHEDULER", "Free data of %s", scheduler_running->name);
 		free(scheduler_running->name);
 		free(scheduler_running);
+		scheduler_running = NULL;
 	}
 
 	/* Trigger scheduling */
