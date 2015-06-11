@@ -11,6 +11,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <limits.h>
+#include <linux/limits.h>
 #include "scheduler.h"
 #include "cpu.h"
 #include "memory.h"

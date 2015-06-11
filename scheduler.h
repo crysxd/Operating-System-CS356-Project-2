@@ -19,14 +19,14 @@
 extern uint32_t scheduler_rr_quantum;
 
 /* Pointers to keep track of the processes' current states */
-static pcb_t *ready_queue_head = NULL;
-static pcb_t *ready_queue_tail = NULL;
-static pcb_t *blocked_list_head = NULL;
-static pcb_t *blocked_list_tail = NULL;
+extern pcb_t *ready_queue_head;
+extern pcb_t *ready_queue_tail;
+extern pcb_t *blocked_list_head;
+extern pcb_t *blocked_list_tail;
 extern pcb_t *scheduler_running;
 
 /* Couter to use ticks for context switch */
-static uint64_t scheduler_consume_ticks = 0;
+extern uint64_t scheduler_consume_ticks;
 
 /* Used to indicate a new tick. Returns false if the tick was consumed and
    the CPU should not run the process this tick */
@@ -45,7 +45,7 @@ void scheduler_trap_page_fault();
 void scheduler_trap_context_switch();
 
 /* Used to move a process from the ready to the blocked list */
-void scheduler_block(pcb_t *process);
+void scheduler_block();
 
 /* Used to move a process from the blocked to the ready queue */;
 void scheduler_ready(pcb_t *process);

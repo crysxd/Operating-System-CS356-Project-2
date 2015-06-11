@@ -9,6 +9,11 @@
 /* Define attributes declared as extern in header */
 uint32_t scheduler_rr_quantum = 200;
 pcb_t *scheduler_running = NULL;
+pcb_t *ready_queue_head = NULL;
+pcb_t *ready_queue_tail = NULL;
+pcb_t *blocked_list_head = NULL;
+pcb_t *blocked_list_tail = NULL;
+uint64_t scheduler_consume_ticks = 0;
 
 /* Used to indicate a new tick. Returns false if the tick was consumed and
    the CPU should not run the process this tick */

@@ -8,6 +8,9 @@
 
 /* Definition of attributes declared in header */
 int32_t pager_page_replacement_algo = 0;
+uint64_t pager_consume_ticks = 0;
+load_request_t *load_request_queue_head = NULL;
+load_request_t *load_request_queue_tail = NULL;
 
 /* Performs a tick */
 void pager_tick() {

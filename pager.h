@@ -23,7 +23,7 @@
 extern int32_t pager_page_replacement_algo;
 
 /* Counter for ticks to be consumed in order to simulated data copying */
-static uint64_t pager_consume_ticks = 0;
+extern uint64_t pager_consume_ticks;
 
 struct load_request {
 	pcb_t *process;
@@ -31,8 +31,8 @@ struct load_request {
 };
 typedef struct load_request load_request_t;
 
-static load_request_t *load_request_queue_head = NULL;
-static load_request_t *load_request_queue_tail = NULL;
+extern load_request_t *load_request_queue_head;
+extern load_request_t *load_request_queue_tail;
 
 void pager_tick();
 
